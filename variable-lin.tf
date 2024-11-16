@@ -67,6 +67,12 @@ variable "user" {
   default = "azureuser"
 }
 
+variable "private_ip" {
+  description = "Static private IP address for the network interface"
+  type        = string
+  default     = "10.15.0.10"
+}
+
 
 
 variable "nsg" {
