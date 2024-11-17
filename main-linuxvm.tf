@@ -3,7 +3,7 @@ resource "azurerm_resource_group" "rgabc" {
   name     = var.rg_name
 }
 
-resource "azurerm_virtual_network" "vnetabc1" {
+resource "azurerm_virtual_network" "network1" {
   name                = "vnet1"
   resource_group_name = var.rg_name
   address_space       = var.address_space1
@@ -21,7 +21,7 @@ resource "azurerm_virtual_network" "network2" {
 resource "azurerm_subnet" "subnetabc" {
   name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.rgabc.name
-  virtual_network_name = azurerm_virtual_network.vnetabc1.name
+  virtual_network_name = azurerm_virtual_network.network1.name
   address_prefixes     = var.subnet_space1
 
 	depends_on = [azurerm_resource_group.rgabc]
@@ -43,10 +43,11 @@ resource "azurerm_ssh_public_key" "ssh" {
   resource_group_name = azurerm_resource_group.rgabc.name
   location            = var.location
   public_key          = file("~/.ssh/id_rsa.pub")
+  
 }
 
-resource "azurerm_public_ip" "public-ipabc" {
-  name                = var.public-ip_name
+resource "azurerm_public_ip" "public_ipabc" {
+  name                = var.public_ip_name
   resource_group_name = azurerm_resource_group.rgabc.name
   location            = var.location
   allocation_method   = "Static"
@@ -61,7 +62,7 @@ resource "azurerm_network_interface" "nicvm1" {
   ip_configuration {
     name                          = var.ip_name
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.public-ipabc.id
+    public_ip_address_id          = azurerm_public_ip.public_ipabc.id
     subnet_id                     = azurerm_subnet.subnetabc.id
   }
 }
@@ -73,25 +74,25 @@ resource "azurerm_network_interface" "nicvm2" {
   ip_configuration {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnetabc2.id
-    private_ip_address            = var.private_ip
+    private_ip_address         = var.private_ip
     private_ip_address_allocation = "Static"
   }
 
 }
 
 resource "azurerm_linux_virtual_machine" "linux-vm1" {
-  name                = var.vm_name
+  name                = "vm1"
   resource_group_name = azurerm_resource_group.rgabc.name
   location            = var.location
 
   admin_username        = var.admin
-  network_interface_ids = [azurerm_network_interface.nicvm1.id]
+  network_interface_ids = [azurerm_network_interface.nicvm1.id] 
   size                  = var.size
   
  admin_ssh_key {
     
     public_key = file("~/.ssh/id_rsa.pub")
-    username   = var.admin
+    username   = var.user
 }
   
  os_disk {
@@ -113,9 +114,10 @@ resource "azurerm_linux_virtual_machine" "vm2" {
   size                = "Standard_B1s"
   admin_username      = var.admin
   admin_ssh_key {
-    username   = var.admin
+    username   = var.user
   public_key = file("~/.ssh/id_rsa.pub")
 }
+
 
 
 os_disk {
@@ -170,7 +172,7 @@ resource "azurerm_network_interface_security_group_association" "nsgasoc" {
 resource "azurerm_virtual_network_peering" "vnet_peering1" {
   name                           = "vnet1-to-vnet2"
   resource_group_name            = azurerm_resource_group.rgabc.name
-  virtual_network_name           = azurerm_virtual_network.vnetabc1.name
+  virtual_network_name           = azurerm_virtual_network.network1.name
   remote_virtual_network_id     = azurerm_virtual_network.network2.id
   allow_virtual_network_access  = true
   allow_forwarded_traffic       = true
@@ -182,7 +184,7 @@ resource "azurerm_virtual_network_peering" "vnet_peering2" {
   name                           = "vnet2-to-vnet1"
   resource_group_name            = azurerm_resource_group.rgabc.name
   virtual_network_name           = azurerm_virtual_network.network2.name
-  remote_virtual_network_id     = azurerm_virtual_network.vnetabc1.id
+  remote_virtual_network_id     = azurerm_virtual_network.network1.id
   allow_virtual_network_access  = true
   allow_forwarded_traffic       = true
   allow_gateway_transit         = false

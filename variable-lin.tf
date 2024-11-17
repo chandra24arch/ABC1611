@@ -3,7 +3,7 @@ variable "rg_name" {
 }
 
 variable "location" {
-  default = "EastAsia"
+  default = "SoutheastAsia"
 }
 
 variable "address_space1" {
@@ -16,11 +16,6 @@ variable "address_space2" {
   type    = list(string)
 }
 
-
-
-variable "vnet_name" {
-  default = "abc_vnet"
-}
 variable "subnet_space1" {
   default = ["10.5.1.0/24", "10.5.2.0/24"]
   type    = list(string)
@@ -44,8 +39,8 @@ variable "key" {
 variable "nic_name" {
   default = "abcnic"
 }
-variable "public-ip_name" {
-  default = "public-winip"
+variable "public_ip_name" {
+  default = "public-linip"
 }
 
 variable "ip_name" {
@@ -55,7 +50,7 @@ variable "sku" {
   default = "22.04-LTS"
 }
 variable "vm_name" {
-  default = "linuxtfvm"
+  default = "vm2"
 }
 variable "admin" {
   default = "azureadmin"
@@ -64,13 +59,13 @@ variable "size" {
   default = "Standard_B1s"
 }
 variable "user" {
-  default = "azureuser"
+  default = "azureadmin"
 }
 
 variable "private_ip" {
   description = "Static private IP address for the network interface"
   type        = string
-  default     = "10.15.0.10"
+  default     = "10.15.0.4"
 }
 
 
